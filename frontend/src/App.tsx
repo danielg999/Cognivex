@@ -1,7 +1,15 @@
-import "./App.css";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ChunkingGamePanel from "./components/ChunkingGamePanel";
 
-function App() {
-  return <h1>Cognivex</h1>;
-}
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/chunking" element={<ChunkingGamePanel />} />
+      </Routes>
+    </Router>
+  );
+};
 
 export default App;

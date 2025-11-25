@@ -1,0 +1,27 @@
+.pyramid-input {
+  width: 20px;
+  height: 20px;
+  margin: 3px 5px;
+  font-size: 18px;
+  text-align: center;
+  border: none;
+  font-weight: bold;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.5); /* Dolne obramowanie */
+  background: transparent; /* Przezroczyste tło */
+  outline: none; /* Usuń domyślny focus */
+}
+
+.pyramid-number {
+  display: inline-block;
+  margin: 0px 10px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.correct {
+  border-bottom: 2px solid green;
+}
+
+.incorrect {
+  border-bottom: 2px solid red;
+}
