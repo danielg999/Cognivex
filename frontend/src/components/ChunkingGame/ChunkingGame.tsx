@@ -6,27 +6,8 @@ import React, {
   useCallback,
 } from "react";
 import classes from "./ChunkingGame.module.css";
-import Pyramid from "./Pyramid";
-
-interface GameState {
-  mode: "remember" | "recall" | "results";
-  config: {
-    rows: number;
-    allRowsAtOnce: boolean;
-    showTime: boolean;
-  };
-  numbers: number[][];
-  userAnswers: string[][];
-  correctPercentage: number | null;
-  elapsedTimeInSeconds: number;
-}
-
-type GameAction =
-  | { type: "remember" }
-  | { type: "recall" }
-  | { type: "results" }
-  | { type: "answer"; value: string; rowIndex: number; numIndex: number }
-  | { type: "incrementElapsedTime" };
+import Pyramid from "./Pyramid/Pyramid";
+import { GameAction, GameState } from "./Game.types";
 
 const gameReducer = (state: GameState, action: GameAction) => {
   let updatedAnswers = [...state.userAnswers];

@@ -1,6 +1,7 @@
 import classes from "./PyramidInput.module.css";
+import { PyramidInputProps } from "./PyramidInput.types";
 
-const PyramidInput = ({
+const PyramidInput: React.FC<PyramidInputProps> = ({
   num,
   rowIndex,
   numIndex,
@@ -9,26 +10,6 @@ const PyramidInput = ({
   handleInputChange,
   handleKeyDown,
   setInputRef,
-}: {
-  num: number;
-  rowIndex: number;
-  numIndex: number;
-  userAnswer: string;
-  mode: "remember" | "recall" | "results";
-  handleInputChange: (
-    rowIndex: number,
-    numIndex: number,
-    value: string
-  ) => void;
-  handleKeyDown: (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    rowIndex: number,
-    numIndex: number
-  ) => void;
-  setInputRef: (
-    rowIndex: number,
-    numIndex: number
-  ) => (el: HTMLInputElement | null) => void;
 }) => {
   let result = (
     <span key={numIndex} className={classes["pyramid-number"]}>

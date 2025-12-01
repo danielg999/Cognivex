@@ -1,6 +1,13 @@
 import styles from "./Navbar.module.css";
+import { GameType } from "../../../types/Game.types";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ onSelectGame }: { onSelectGame: (game: string) => void }) => {
+const Navbar = () => {
+  const navigate = useNavigate();
+
+  const onSelectGame = (game: GameType) => {
+    navigate(`/${game}`);
+  };
   return (
     <nav className={styles.navbar}>
       <button

@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import ChunkingGame from "./ChunkingGame";
 
 const ChunkingGamePanel = () => {
-  const [isConfig, setIsConfig] = useState(true); // Stan: konfiguracja czy gra
+  const [isConfig, setIsConfig] = useState(true);
   const [config, setConfig] = useState({
     rows: 10,
     allRowsAtOnce: false,
     showTime: false,
-  }); // Domyślne ustawienia
+  });
 
   const handleStart = () => {
-    setIsConfig(false); // Przełącz na widok gry
+    setIsConfig(false);
   };
 
   return (

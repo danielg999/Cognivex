@@ -1,7 +1,8 @@
-import PyramidInput from "./PyramidInput";
+import PyramidInput from "../PyramidInput/PyramidInput";
 import classes from "./PyramidRow.module.css";
+import { PyramidRowProps } from "./PyramidRow.types";
 
-const PyramidRow = ({
+const PyramidRow: React.FC<PyramidRowProps> = ({
   row,
   rowIndex,
   userAnswers,
@@ -9,25 +10,6 @@ const PyramidRow = ({
   handleInputChange,
   handleKeyDown,
   setInputRef,
-}: {
-  row: number[];
-  rowIndex: number;
-  userAnswers: string[];
-  mode: "remember" | "recall" | "results";
-  handleInputChange: (
-    rowIndex: number,
-    numIndex: number,
-    value: string
-  ) => void;
-  handleKeyDown: (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    rowIndex: number,
-    numIndex: number
-  ) => void;
-  setInputRef: (
-    rowIndex: number,
-    numIndex: number
-  ) => (el: HTMLInputElement | null) => void;
 }) => {
   return (
     <div className={classes["pyramid-row"]}>
