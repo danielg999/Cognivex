@@ -1,82 +1,30 @@
-import React, {
-  useRef,
-  useReducer,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useRef, useMemo, useCallback } from "react";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import {
+  remember,
+  recall,
+  results,
+  answer,
+  incrementElapsedTime,
+  showNextRow,
+  resetGame,
+} from "../../store/slices/chunkingGameSlice";
 import classes from "./ChunkingGame.module.css";
 import Pyramid from "./Pyramid/Pyramid";
-import { GameAction, GameState } from "./Game.types";
 
-const gameReducer = (state: GameState, action: GameAction) => {
-  let updatedAnswers = [...state.userAnswers];
-  switch (action.type) {
-    case "remember":
-      const numbers = getRandomNumbers(state.config);
-      updatedAnswers = numbers.map((row) => row.map(() => ""));
-
-      return {
-        ...state,
-        mode: "remember" as "remember",
-        numbers: numbers,
-        userAnswers: updatedAnswers,
-        correctPercentage: null,
-        elapsedTimeInSeconds: 0,
-      };
-    case "recall":
-      return { ...state, mode: "recall" as "recall" };
-    case "results":
-      const correctPercentage = calculateCorrectPercentage(
-        state.userAnswers,
-        state.numbers
-      );
-      return { ...state, mode: "results" as "results", correctPercentage };
-    case "answer":
-      const { rowIndex, numIndex, value } = action;
-      updatedAnswers[rowIndex][numIndex] = value;
-
-      return {
-        ...state,
-        userAnswers: updatedAnswers,
-      };
-    case "incrementElapsedTime":
-      const elapsedTimeInSeconds = state.elapsedTimeInSeconds + 1;
-      return { ...state, elapsedTimeInSeconds: elapsedTimeInSeconds };
-    default:
-      return state;
-  }
-};
-
-const ChunkingGame = ({
-  config,
-}: {
-  config: {
-    rows: number;
-    allRowsAtOnce: boolean;
-    showTime: boolean;
-  };
-}) => {
-  const [game, gameDispatch] = useReducer(gameReducer, {
-    mode: "remember",
-    config: config,
-    numbers: [],
-    userAnswers: [],
-    correctPercentage: null,
-    elapsedTimeInSeconds: 0,
-  });
+const ChunkingGame = () => {
+  const dispatch = useAppDispatch();
+  const game = useAppSelector((state) => state.chunkingGame);
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    gameDispatch({ type: "remember" });
-  }, []);
+    dispatch(remember());
+  }, [dispatch, showNextRow, resetGame]);
 
   useEffect(() => {
-    if (game.mode === "remember" && config.showTime) {
+    if (game.mode === "remember" && game.config.showTime) {
       intervalRef.current = setInterval(() => {
-        if (game.mode === "remember" && config.showTime) {
-          gameDispatch({ type: "incrementElapsedTime" });
-        }
+        dispatch(incrementElapsedTime());
       }, 1000);
     }
 
@@ -85,7 +33,7 @@ const ChunkingGame = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [config, game.mode]);
+  }, [dispatch, game.mode, game.config.showTime]);
 
   const formattedElapsedTime = useMemo(
     () =>
@@ -108,28 +56,20 @@ const ChunkingGame = ({
     []
   );
 
-  const handleStartRecalling = useCallback(() => {
-    gameDispatch({ type: "recall" });
-  }, [gameDispatch]);
-
-  const handleFinishRecalling = useCallback(() => {
-    gameDispatch({ type: "results" });
-  }, [gameDispatch]);
-
-  const handleStartRemembering = useCallback(() => {
-    gameDispatch({ type: "remember" });
-  }, [gameDispatch]);
-
   const handleInputChange = useCallback(
     (rowIndex: number, numIndex: number, value: string) => {
-      gameDispatch({ type: "answer", value, rowIndex, numIndex });
-      if (value.length === 1 && inputRefs.current[rowIndex]?.[numIndex + 1]) {
+      dispatch(answer({ rowIndex, numIndex, value }));
+      if (
+        game.config.allRowsAtOnce &&
+        value.length === 1 &&
+        inputRefs.current[rowIndex]?.[numIndex + 1]
+      ) {
         inputRefs.current[rowIndex]?.[numIndex + 1]?.focus();
       } else if (value.length === 1 && inputRefs.current[rowIndex + 1]?.[0]) {
         inputRefs.current[rowIndex + 1]?.[0]?.focus();
       }
     },
-    [gameDispatch]
+    [dispatch]
   );
 
   const handleKeyDown = (
@@ -144,6 +84,7 @@ const ChunkingGame = ({
     ) {
       inputRefs.current[rowIndex]?.[numIndex - 1]?.focus();
     } else if (
+      game.config.allRowsAtOnce &&
       e.key === "Backspace" &&
       inputRefs.current[rowIndex - 1] &&
       e.currentTarget.value.length === 0
@@ -156,15 +97,15 @@ const ChunkingGame = ({
   return (
     <div>
       {game.mode === "remember" && (
-        <button onClick={handleStartRecalling}>Start recalling</button>
+        <button onClick={() => dispatch(recall())}>Start recalling</button>
       )}
       {game.mode === "recall" && (
-        <button onClick={handleFinishRecalling}>Finish recalling</button>
+        <button onClick={() => dispatch(results())}>Finish recalling</button>
       )}
       {game.mode === "results" && (
-        <button onClick={handleStartRemembering}>Try again</button>
+        <button onClick={() => dispatch(remember())}>Try again</button>
       )}
-      {((game.mode === "remember" && config.showTime) ||
+      {((game.mode === "remember" && game.config.showTime) ||
         game.mode === "results") && <p>{formattedElapsedTime}</p>}
       <Pyramid
         numbers={game.numbers}
@@ -173,6 +114,7 @@ const ChunkingGame = ({
         handleInputChange={handleInputChange}
         handleKeyDown={handleKeyDown}
         setInputRef={setInputRef}
+        rowsVisibility={game.rowsVisibility}
       />
       {game.correctPercentage !== null && (
         <div className={classes["result"]}>
@@ -184,40 +126,3 @@ const ChunkingGame = ({
 };
 
 export default ChunkingGame;
-
-const getRandomNumbers = (config: {
-  rows: number;
-  allRowsAtOnce: boolean;
-  showTime: boolean;
-}): number[][] => {
-  const result: number[][] = [];
-
-  for (let i = 0; i < config.rows; i++) {
-    const length = 4 + i;
-    const innerArray = Array.from({ length }, () =>
-      Math.floor(Math.random() * 10)
-    );
-    result.push(innerArray);
-  }
-
-  return result;
-};
-
-const calculateCorrectPercentage = (
-  userAnswers: string[][],
-  numbers: number[][]
-): number => {
-  let correctCount = 0;
-  let totalCount = 0;
-
-  numbers.forEach((row, rowIndex) => {
-    row.forEach((num, numIndex) => {
-      totalCount++;
-      if (userAnswers[rowIndex]?.[numIndex] === num.toString()) {
-        correctCount++;
-      }
-    });
-  });
-
-  return (correctCount / totalCount) * 100;
-};

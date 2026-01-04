@@ -10,13 +10,20 @@ const PyramidInput: React.FC<PyramidInputProps> = ({
   handleInputChange,
   handleKeyDown,
   setInputRef,
+  isVisible,
 }) => {
   let result = (
     <span key={numIndex} className={classes["pyramid-number"]}>
       {num}
     </span>
   );
-  if (mode === "recall") {
+  if (mode === "recall" && !isVisible) {
+    result = (
+      <span key={numIndex} className={classes["pyramid-number"]}>
+        X
+      </span>
+    );
+  } else if (mode === "recall") {
     result = (
       <input
         ref={setInputRef(rowIndex, numIndex)}

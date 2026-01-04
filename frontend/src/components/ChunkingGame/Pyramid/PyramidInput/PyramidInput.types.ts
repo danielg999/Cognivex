@@ -18,4 +18,5 @@ export interface PyramidInputProps {
     rowIndex: number,
     numIndex: number
   ) => (el: HTMLInputElement | null) => void;
+  isVisible: boolean;
 }

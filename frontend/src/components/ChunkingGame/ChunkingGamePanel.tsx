@@ -1,77 +1,61 @@
-import React, { useState } from "react";
-import ChunkingGame from "./ChunkingGame";
+import React from "react";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { setConfig } from "../../store/slices/chunkingGameSlice";
+
+import { useNavigate } from "react-router-dom";
 
 const ChunkingGamePanel = () => {
-  const [isConfig, setIsConfig] = useState(true);
-  const [config, setConfig] = useState({
-    rows: 10,
-    allRowsAtOnce: false,
-    showTime: false,
-  });
+  const dispatch = useAppDispatch();
+  const config = useAppSelector((state) => state.chunkingGame.config);
+  const navigate = useNavigate();
 
-  const handleStart = () => {
-    setIsConfig(false);
+  const handleConfigChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    dispatch(
+      setConfig({
+        ...config,
+        [name]: type === "checkbox" ? checked : parseInt(value, 10),
+      })
+    );
+  };
+
+  const handleStartGame = () => {
+    navigate("/chunking-game");
   };
 
   return (
     <div>
-      {isConfig ? (
-        <div>
-          <h1>Konfiguracja gry Chunking</h1>
-          <p>Ustaw parametry gry:</p>
-          <label>
-            Liczba wierszy:
-            <input
-              type="number"
-              value={config.rows}
-              onChange={(e) =>
-                setConfig({ ...config, rows: parseInt(e.target.value) })
-              }
-            />
-          </label>
-          <br />
-          <label>
-            Pokaż wszystkie wiersze na raz:
-            <input
-              type="checkbox"
-              checked={config.allRowsAtOnce}
-              onChange={(e) =>
-                setConfig({
-                  ...config,
-                  allRowsAtOnce: e.target.checked,
-                })
-              }
-            />
-          </label>
-          <br />
-          <label>
-            Show time:
-            <input
-              type="checkbox"
-              checked={config.showTime}
-              onChange={(e) =>
-                setConfig({ ...config, showTime: e.target.checked })
-              }
-            />
-          </label>
-          <br />
-          <button onClick={handleStart}>Start</button>
-        </div>
-      ) : (
-        <div>
-          <h1>Gra Chunking</h1>
-          <p>Rozpocznij grę i ćwicz chunking!</p>
-          <p>Ustawienia gry:</p>
-          <ul>
-            <li>Liczba wierszy: {config.rows}</li>
-            <li>
-              Wszystkie wiersze na raz: {config.allRowsAtOnce ? "TAK" : "NIE"}
-            </li>
-            <li>Pokaż czas: {config.showTime ? "TAK" : "NIE"}</li>
-          </ul>
-          <ChunkingGame config={config} />
-        </div>
-      )}
+      <h2>Chunking Game Configuration</h2>
+      <label>
+        Rows:
+        <input
+          type="number"
+          name="rows"
+          value={config.rows}
+          onChange={handleConfigChange}
+        />
+      </label>
+      <br />
+      <label>
+        All Rows At Once:
+        <input
+          type="checkbox"
+          name="allRowsAtOnce"
+          checked={config.allRowsAtOnce}
+          onChange={handleConfigChange}
+        />
+      </label>
+      <br />
+      <label>
+        Show Time:
+        <input
+          type="checkbox"
+          name="showTime"
+          checked={config.showTime}
+          onChange={handleConfigChange}
+        />
+      </label>
+      <button onClick={handleStartGame}>Start Game</button>
     </div>
   );
 };

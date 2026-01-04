@@ -16,4 +16,5 @@ export interface PyramidProps {
     rowIndex: number,
     numIndex: number
   ) => (el: HTMLInputElement | null) => void;
+  rowsVisibility: boolean[];
 }

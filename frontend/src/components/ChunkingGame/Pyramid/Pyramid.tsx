@@ -9,6 +9,7 @@ const Pyramid: React.FC<PyramidProps> = ({
   handleInputChange,
   handleKeyDown,
   setInputRef,
+  rowsVisibility,
 }) => {
   return (
     <div className={classes["pyramid"]}>
@@ -22,6 +23,7 @@ const Pyramid: React.FC<PyramidProps> = ({
           handleInputChange={handleInputChange}
           handleKeyDown={handleKeyDown}
           setInputRef={setInputRef}
+          isVisible={rowsVisibility[rowIndex]}
         />
       ))}
     </div>
